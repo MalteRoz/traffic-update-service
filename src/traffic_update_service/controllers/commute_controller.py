@@ -1,12 +1,12 @@
+from traffic_update_service.services.trafik_service import TrafikService
+
+
 class CommuteController:
     """Handles the main workflow for fetching and sending commute updates."""
 
     def __init__(self):
-        # Later you’ll inject services here
-        pass
+        self.trafik_service = TrafikService()
 
     def run(self):
-        """Entry point for the commute check."""
-        print("🚦 CommuteController is running...")
-        # Placeholder for now
-        print("✅ Everything is wired up correctly!")
+        data = self.trafik_service.get_traffic_data()
+        print(data)
