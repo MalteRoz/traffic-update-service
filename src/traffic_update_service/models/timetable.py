@@ -1,4 +1,5 @@
 from datetime import date
+from typing import List
 from pydantic import BaseModel, Field
 
 
@@ -16,6 +17,7 @@ class ResRobotTripParams(BaseModel):
     maxChangeTime: int = 15
     changeTimePercent: int = 100
     products: int = Field(132, description="Transport modes (sum of mode flags)")
+    operators: List[str] = Field([], description="Operators (sum of operator flags)")
     poly: int = 0
     passlist: int = 0
     unsharp: int = 0
@@ -28,4 +30,9 @@ class ResRobotTripParams(BaseModel):
         """Convert model to query dict for requests.get"""
         params = self.model_dump()
         params["accessId"] = access_id
+        
+        # Convert operators list to comma-separated string as required by API
+        if params.get("operators"):
+            params["operators"] = ",".join(params["operators"])
+        
         return params
