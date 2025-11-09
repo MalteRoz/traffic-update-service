@@ -1,12 +1,21 @@
-from traffic_update_service.services.trafik_service import TrafikService
+import json
+from traffic_update_service.services.commute_service import CommuteService
+from traffic_update_service.utils.exceptions import TrafficServiceException
 
 
 class CommuteController:
     """Handles the main workflow for fetching and sending commute updates."""
 
     def __init__(self):
-        self.trafik_service = TrafikService()
+        self.commute_service = CommuteService()
 
     def run(self):
-        data = self.trafik_service.get_traffic_data()
-        print(data)
+
+        try:
+            data = self.commute_service.get_traffic_data()
+            data_dict = [trip.model_dump() for trip in data]
+
+            print(json.dumps(data_dict, indent=2, ensure_ascii=False))
+        except TrafficServiceException as e:
+            print(f"Error fetching traffic data: {e}")
+            return 
