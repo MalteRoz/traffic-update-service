@@ -1,6 +1,7 @@
 from typing import List
 from traffic_update_service.models.trip_model import TripLegModel, TripModel
 from traffic_update_service.repositories.commute_repository import CommuteRepository
+from traffic_update_service.utils.exceptions import EmptyDataException
 
 class CommuteService:
     def __init__(self):
@@ -9,7 +10,11 @@ class CommuteService:
     def get_traffic_data(self):
         dirty_data = self.commute_repository.get_traffic_data()
 
+        if dirty_data.get("Trip") is None:
+            raise EmptyDataException()
+        
         clean_data =self._parse_traffic_data(dirty_data)
+
         return clean_data
 
     def _parse_traffic_data(self, dirty_data):
@@ -57,6 +62,7 @@ class CommuteService:
         # 3. returna den sorterade arrayen
 
         target_time = self._time_to_minutes("09:30")
+
         target_time_home = self._time_to_minutes("19:30")
 
         sorted_trips = sorted(trips,
@@ -67,7 +73,7 @@ class CommuteService:
 
     def _time_to_minutes(self, time: str):
         
-        # 1. split time into hours and minutes
+        # 1. split time into hours and minutes variables
         # 2. convert hours and minutes to minutes
         # 3. return the total minutes
 

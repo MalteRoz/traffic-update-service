@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 
 from traffic_update_service.models.timetable import ResRobotTripParams
+from traffic_update_service.utils.exceptions import ExternalApiException
 
 load_dotenv()
 
@@ -35,11 +36,10 @@ class CommuteRepository:
             format="json",
             requestId="resrobot-request"
         )
-
         params_home = ResRobotTripParams(
             originId="740000001",
             destId="740007480",
-            date="2025-11-01",
+            date="2025-11-09",
             time="19:30",
             searchForArrival=1,
             viaWaitTime=0,
@@ -59,17 +59,15 @@ class CommuteRepository:
             requestId="resrobot-request"
         )
         
-        query_params = params.to_query_params(self.api_key)
-        query_params_home = params_home.to_query_params(self.api_key)
+        try:
+            query_params = params.to_query_params(self.api_key)
+            query_params_home = params_home.to_query_params(self.api_key)
 
-        response = requests.get(f"{self.resrobot_url}", params=query_params_home)
-        print(response.url)
-
-        response.raise_for_status()
-
-        return response.json()
-      
-
-
-        
-      
+            response = requests.get(f"{self.resrobot_url}", params=query_params_home)
+            # print(response.url)
+            
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            response_status_code = response.status_code
+            raise ExternalApiException(f"Error fetching traffic data: {e}", response_status_code)
