@@ -17,7 +17,7 @@ class CommuteRepository:
         params = ResRobotTripParams(
             originId="740007480",
             destId="740000001",
-            date="2025-11-01",
+            date="2025-11-15",
             time="09:30",
             searchForArrival=1,
             viaWaitTime=0,
@@ -39,7 +39,7 @@ class CommuteRepository:
         params_home = ResRobotTripParams(
             originId="740000001",
             destId="740007480",
-            date="2025-11-09",
+            date="2025-11-16",
             time="19:30",
             searchForArrival=1,
             viaWaitTime=0,
