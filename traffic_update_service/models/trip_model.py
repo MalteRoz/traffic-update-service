@@ -22,7 +22,3 @@ class TripModel(BaseModel):
     total_duration: Optional[str] = Field(None, description="Total duration of trip")
     changes: Optional[int] = Field(None, description="Number of transfers/changes")
     legs: List[TripLegModel] = Field(default_factory=list)
-
-
-# om det är tåg lägg till spår nmr
-# operator för tåg och buss 
