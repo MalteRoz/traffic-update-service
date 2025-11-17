@@ -15,7 +15,7 @@ class CommuteController:
             data = self.commute_service.get_traffic_data()
             data_dict = [trip.model_dump() for trip in data]
 
-            print(json.dumps(data_dict, indent=2, ensure_ascii=False))
+            return(json.dumps(data_dict, indent=2, ensure_ascii=False))
         except TrafficServiceException as e:
             print(f"Error fetching traffic data: {e}")
             return 
