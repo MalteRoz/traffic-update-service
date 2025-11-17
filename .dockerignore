@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.yaml.example
+
+# Git
+.git/
+.gitignore
+.github/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# Documentation
+*.md
+!README.md
+
+# Other
+.DS_Store
+Thumbs.db
+makefile
+dockerfile
+docker-compose.yml
+uv.lock
+
+# Tests (optional - uncomment if you don't want tests in prod image)
+# tests/
+# test_*.py
+# *_test.py
+
