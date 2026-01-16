@@ -113,3 +113,69 @@ test:
 
 clean:
 	docker rmi $(IMAGE_NAME) || true
+
+# Add to your variables section at top
+MORNING_SCHEDULE = "0 7 * * 1-5"
+EVENING_SCHEDULE = "0 18 * * 1-5"
+TIMEZONE = "Europe/Stockholm"
+
+# Add these new targets
+setup-scheduler:
+	@echo "🕐 Setting up Cloud Scheduler jobs..."
+	@SERVICE_URL=$$(gcloud run services describe $(SERVICE_NAME) --region $(REGION) --format 'value(status.url)' --project $(PROJECT_ID)); \
+	echo "Service URL: $$SERVICE_URL"; \
+	gcloud scheduler jobs create http morning-commute \
+		--location $(REGION) \
+		--schedule $(MORNING_SCHEDULE) \
+		--time-zone $(TIMEZONE) \
+		--uri "$$SERVICE_URL/update-commute" \
+		--http-method POST \
+		--attempt-deadline 300s \
+		--project $(PROJECT_ID) || echo "Job already exists"; \
+	gcloud scheduler jobs create http evening-commute \
+		--location $(REGION) \
+		--schedule $(EVENING_SCHEDULE) \
+		--time-zone $(TIMEZONE) \
+		--uri "$$SERVICE_URL/update-commute" \
+		--http-method POST \
+		--attempt-deadline 300s \
+		--project $(PROJECT_ID) || echo "Job already exists"
+	@echo "✅ Scheduler jobs created!"
+
+update-schedule:
+	@echo "📝 Updating schedule times..."
+	gcloud scheduler jobs update http morning-commute \
+		--location $(REGION) \
+		--schedule $(MORNING_SCHEDULE) \
+		--project $(PROJECT_ID)
+	gcloud scheduler jobs update http evening-commute \
+		--location $(REGION) \
+		--schedule $(EVENING_SCHEDULE) \
+		--project $(PROJECT_ID)
+
+trigger-morning:
+	@echo "🌅 Triggering morning commute update..."
+	gcloud scheduler jobs run morning-commute --location $(REGION) --project $(PROJECT_ID)
+
+trigger-evening:
+	@echo "🌆 Triggering evening commute update..."
+	gcloud scheduler jobs run evening-commute --location $(REGION) --project $(PROJECT_ID)
+
+list-jobs:
+	@echo "📋 Scheduled jobs:"
+	gcloud scheduler jobs list --location $(REGION) --project $(PROJECT_ID)
+
+pause-scheduler:
+	@echo "⏸️  Pausing scheduler jobs..."
+	gcloud scheduler jobs pause morning-commute --location $(REGION) --project $(PROJECT_ID)
+	gcloud scheduler jobs pause evening-commute --location $(REGION) --project $(PROJECT_ID)
+
+resume-scheduler:
+	@echo "▶️  Resuming scheduler jobs..."
+	gcloud scheduler jobs resume morning-commute --location $(REGION) --project $(PROJECT_ID)
+	gcloud scheduler jobs resume evening-commute --location $(REGION) --project $(PROJECT_ID)
+
+delete-scheduler:
+	@echo "🗑️  Deleting scheduler jobs..."
+	gcloud scheduler jobs delete morning-commute --location $(REGION) --project $(PROJECT_ID) --quiet
+	gcloud scheduler jobs delete evening-commute --location $(REGION) --project $(PROJECT_ID) --quiet
